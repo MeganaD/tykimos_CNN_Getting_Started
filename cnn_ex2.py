@@ -6,7 +6,15 @@ np.random.seed(3)
 from keras.preprocessing.image import ImageDataGenerator
 
 # 데이터셋 불러오기
-train_datagen = ImageDataGenerator(rescale=1./255)
+train_datagen = ImageDataGenerator(rescale=1./255, 
+                                   rotation_range=10,
+                                   width_shift_range=0.2,
+                                   height_shift_range=0.2,
+                                   shear_range=0.7,
+                                   zoom_range=[0.9, 2.2],
+                                   horizontal_flip=True,
+                                   vertical_flip=True,
+                                   fill_mode='nearest')
 
 train_generator = train_datagen.flow_from_directory(
         'warehouse/hard_handwriting_shape/train',
@@ -28,7 +36,8 @@ from keras.layers import Flatten
 from keras.layers.convolutional import Conv2D
 from keras.layers.convolutional import MaxPooling2D
 
-# 모델 구성하기
+from keras.layers import Dropout
+
 model = Sequential()
 model.add(Conv2D(32, kernel_size=(3, 3),
                  activation='relu',
@@ -45,7 +54,7 @@ model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accur
 # 모델 학습시키기
 model.fit_generator(
         train_generator,
-        steps_per_epoch=15,
+        steps_per_epoch=15 * 100,
         epochs=200,
         validation_data=test_generator,
         validation_steps=5)
